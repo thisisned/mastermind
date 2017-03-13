@@ -10,7 +10,7 @@ class Player # Generates / collects codes and guesses. Keeps track of guesses ma
 	end
 
 	def get_code
-		if @ai # Probably there's a cleaner way to implement this. If player's a computer gets a random quartet.
+		if @ai # Probably there's a cleaner way to implement this. If player's a computer, gets a random quartet.
 			code = []
 			puts "Computer generating code. Press ENTER to continue."
 			gets
@@ -49,6 +49,8 @@ class Game
 	
 	def setup
 		prompt = "> "
+		puts "\nInstructions: Someone picks a code of 4 numbers between 1 and 6. Other guy tries to guess it."
+		puts "Feedback is provided on how good your guesses are."
 		puts "\nOptions:"
 		puts "(1) Computer sets number, human guesses"
 		puts "(2) Human sets number, computer guesses (badly)"
@@ -86,15 +88,15 @@ class Game
 			draw
 			if win(feedback)
 				puts "YOU WIN HOORAY"
-				setup if play_again?
-				exit
+				break
 			end
 			if i == 1
 				puts "Sorry you did not win booooo."
-				setup if play_again?
-				exit
+				break
 			end
 		end
+		setup if play_again?
+		exit
 	end
 	
 	def check guess
