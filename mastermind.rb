@@ -1,16 +1,16 @@
-class Player
+class Player # Generates / collects codes and guesses. Keeps track of guesses made.
 	
 	attr_accessor :guess_history, :feedback_history
 	attr_reader :ai
 
-	def initialize (ai)
+	def initialize ai  
 		@ai = ai
 		@guess_history = []
 		@feedback_history = []
 	end
 
 	def get_code
-		if @ai
+		if @ai # Probably there's a cleaner way to implement this. If player's a computer gets a random quartet.
 			code = []
 			puts "Computer generating code. Press ENTER to continue."
 			gets
@@ -18,7 +18,7 @@ class Player
 			return code.join
 		else
 			print "Enter code: "
-			loop do
+			loop do # Input checking for human code-getting
 				code = gets.chomp
 				if wrong_size? (code)
 					puts "Must be four numbers long:"
@@ -30,12 +30,12 @@ class Player
 		end
 	end
 
-	def wrong_size? (code)
+	def wrong_size? code
 		code.length != 4
 	end
 
-	def wrong_range? (code)
-		code.split('').any? {|n| !n.to_i.between?(1, 6) }
+	def wrong_range? code
+		code.split('').any? { |n| !n.to_i.between?(1, 6) }
 	end
 
 end
@@ -49,13 +49,13 @@ class Game
 	
 	def setup
 		prompt = "> "
-		puts "Options:"
+		puts "\nOptions:"
 		puts "(1) Computer sets number, human guesses"
 		puts "(2) Human sets number, computer guesses (badly)"
 		puts "\n"
 		print prompt
 		while choice = gets.chomp.to_i
-			case choice
+			case choice # True = AI, False = Person.
 			when 1
 				s, g  = true, false
 				break
@@ -63,7 +63,7 @@ class Game
 				s, g = false, true
 				break
 			when 3
-				s, g = false, false # No AI, for debugging
+				s, g = false, false # Exciting hidden option! No AI, for debugging
 				break
 			else
 				puts "1 or 2 please."
@@ -75,12 +75,12 @@ class Game
 		play
 	end
 	
-	def play
-		@master = @setter.get_code
+	def play # Game logic / flow
+		@master = @setter.get_code # Sets the master code to get guessed
 		@guesses_left.downto(1) do |i|
 			puts "Guesses left: #{i}.\n"
 			guess = @guesser.get_code
-			@guesser.guess_history << guess
+			@guesser.guess_history << guess # Keeping track of guesses / feedback to draw the 'board'
 			feedback = check(guess)
 			@guesser.feedback_history << feedback
 			draw
@@ -97,27 +97,32 @@ class Game
 		end
 	end
 	
-	def check(guess)
+	def check guess
+	# A difficult to get head around method to check guess and generate feedback
+	# - For each digit in the master code, goes through and checks if the corresponding digit in the guess is
+	#   totally correct. Pushes an O to the feedback array if so and removes both.
+	# - Then, checks each remaining number in the guess against what's left in the master code.
+	#   Pushes an o to the feedback if included in master code, then element removed from master code.
 		temp_master = @master.split('')
 		temp_guess = guess.split('')
 		feedback = []
 		temp_master.each_with_index do |n, i|
 			if n == temp_guess[i]
 				feedback << "O"
-				temp_guess[i] = "?"
-				temp_master[i] = "!"
+				temp_guess[i] = "?"  # Maintaining length of arrays but replacing items with gibberish so
+				temp_master[i] = "!" # they don't get counted twice.
 			end
 		end
 		temp_guess.each do |n|
 			if temp_master.include? n
 				feedback << "o" 
-				temp_master.delete_at(temp_master.index(n) || temp_master.length)
+				temp_master.delete_at(temp_master.index(n) || temp_master.length) # Deletes only first instance of n - handy
 			end
 		end
-		feedback.sort.join
+		feedback.sort.join # O's first, then o's
 	end
 	
-	def win(feedback)
+	def win feedback
 		feedback == "OOOO"
 	end
 	
@@ -127,7 +132,7 @@ class Game
 		gets.chomp.upcase == "Y" ? true : false
 	end
 	
-	def draw
+	def draw # Draws a display with history of guesses and feedback (all formatted nice)
 		puts "-"*21
 		@guesser.guess_history.each_with_index do |n, i|
 			puts "| %-3s | %-4s | %-4s |" % [(i+1).to_s+".", @guesser.guess_history[i], @guesser.feedback_history[i]]
