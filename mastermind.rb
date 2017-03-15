@@ -105,12 +105,12 @@ class Game
   #   totally correct. Pushes an O to the feedback array if so and removes both.
   # - Then, checks each remaining number in the guess against what's left in the master code.
   #   Pushes an o to the feedback if included in master code, then element removed from master code.
-    temp_master = @master.split('')
-    temp_guess = guess.split('')
-    feedback = []
-    temp_master.each_with_index do |n, i|
-      if n == temp_guess[i]
-        feedback << "O"
+  temp_master = @master.split('')
+  temp_guess = guess.split('')
+  feedback = []
+  temp_master.each_with_index do |n, i|
+    if n == temp_guess[i]
+      feedback << "O"
         temp_guess[i] = "?"  # Maintaining length of arrays but replacing items with gibberish so
         temp_master[i] = "!" # they don't get counted twice.
       end
@@ -137,7 +137,7 @@ class Game
   def draw # Draws a display with history of guesses and feedback (all formatted nice)
     puts "-"*21
     @guesser.guess_history.each_with_index do |n, i|
-      puts "| %-3s | %-4s | %-4s |" % [(i+1).to_s+".", @guesser.guess_history[i], @guesser.feedback_history[i]]
+      puts "| %-3s | %-4s | %-4s |" % [(i+1).to_s+".", n, @guesser.feedback_history[i]]
     end
     puts "-"*21
     puts "\n(O = Correct number, correct location : o = Correct number, wrong location)\n\n"
