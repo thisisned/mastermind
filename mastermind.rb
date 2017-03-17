@@ -1,10 +1,11 @@
 class Player # Generates / collects codes and guesses. Keeps track of guesses made.
   
   attr_accessor :guess_history, :feedback_history
-  attr_reader :ai
+  attr_reader :ai, :name
 
   def initialize ai  
     @ai = ai
+    ai == true ? @name = "computer" : @name = "human" 
     @guess_history = []
     @feedback_history = []
   end
@@ -87,11 +88,11 @@ class Game
       @guesser.feedback_history << feedback
       draw
       if win(feedback)
-        puts "YOU WIN HOORAY"
+        puts "#{@guesser.name.upcase} WINS HOORAY"
         break
       end
       if i == 1
-        puts "Sorry you did not win booooo."
+        puts "Sorry #{@guesser.name} you did not win booooo."
         break
       end
     end
