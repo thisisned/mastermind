@@ -1,5 +1,5 @@
 class Player # Generates / collects codes and guesses. Keeps track of guesses made.
-  
+
   attr_accessor :guess_history, :feedback_history
   attr_reader :ai, :name
 
@@ -45,7 +45,7 @@ class Game
 
   def initialize
     @guesses_left = 12
-    setup
+    play
   end
   
   def setup
@@ -75,31 +75,32 @@ class Game
     end
     @setter = Player.new(s)
     @guesser = Player.new(g)
-    play
   end
   
   def play # Game logic / flow
-    @master = @setter.get_code # Sets the master code to get guessed
-    @guesses_left.downto(1) do |i|
-      puts "Guesses left: #{i}.\n"
-      guess = @guesser.get_code
-      @guesser.guess_history << guess # Keeping track of guesses / feedback to draw the 'board'
-      feedback = check(guess)
-      @guesser.feedback_history << feedback
-      draw
-      if win(feedback)
-        puts "#{@guesser.name.upcase} WINS HOORAY"
-        break
+    loop do
+      setup
+      @master = @setter.get_code # Sets the master code to get guessed
+      @guesses_left.downto(1) do |i|
+        puts "Guesses left: #{i}.\n"
+        guess = @guesser.get_code
+        @guesser.guess_history << guess # Keeping track of guesses / feedback to draw the 'board'
+        feedback = check(guess)
+        @guesser.feedback_history << feedback
+        draw
+        if win(feedback)
+          puts "#{@guesser.name.upcase} WINS HOORAY"
+          break
+        end
+        if i == 1
+          puts "Sorry #{@guesser.name} you did not win booooo."
+          break
+        end
       end
-      if i == 1
-        puts "Sorry #{@guesser.name} you did not win booooo."
-        break
-      end
+      break unless play_again?
     end
-    setup if play_again?
-    exit
   end
-  
+
   def check guess
   # A difficult to get head around method to check guess and generate feedback
   # - For each digit in the master code, goes through and checks if the corresponding digit in the guess is
@@ -132,7 +133,9 @@ class Game
   def play_again?
     puts "\nAnother game? (y/n)"
     print "> "
-    gets.chomp.upcase == "Y" ? true : false
+    return false unless gets.chomp.upcase == "Y"
+    setup
+    true
   end
   
   def draw # Draws a display with history of guesses and feedback (all formatted nice)
