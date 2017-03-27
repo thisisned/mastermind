@@ -134,7 +134,6 @@ class Game
     puts "\nAnother game? (y/n)"
     print "> "
     return false unless gets.chomp.upcase == "Y"
-    setup
     true
   end
   
